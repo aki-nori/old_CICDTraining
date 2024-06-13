@@ -1,4 +1,4 @@
-name: e2e Test
+name: e2e Test and Publish Result
 
 # mainブランチに対してpushされたタイミングで実行
 on:
@@ -34,5 +34,26 @@ jobs:
       # テスト実行. テスト失敗時も継続
       - name: PyTest
         run: |
-          python -m pytest tests/test_practice3.py
+          python -m pytest tests/test_practice3.py --junit-xml results/pytest.xml
         continue-on-error: true
+
+      # テスト結果の表示
+      - name: Upload Test Results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: test-results-xml
+          path: results/*.xml
+
+      - name: Download Artifacts
+        if: ${{ always() }}
+        uses: actions/download-artifact@v3.0.1
+        with:
+          path: artifacts
+
+      - name: Publish Test Results
+        if: ${{ always() }}
+        uses: EnricoMi/publish-unit-test-result-action@v2.4.2
+        with:
+          junit_files: artifacts/**/*.xml
+
