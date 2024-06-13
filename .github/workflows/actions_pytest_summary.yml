@@ -1,6 +1,6 @@
 name: e2e Test and Publish Result
 
-# mainブランチに対してpushされたタイミングで実行
+# mainブランチに対してpushされたタイミングで実行する
 on:
   push:
     branches:
