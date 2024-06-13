@@ -1,0 +1,38 @@
+name: e2e Test
+
+# mainブランチに対してpushされたタイミングで実行
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  RunPytest:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # リポジトリをチェックアウト
+      - uses: actions/checkout@v3.4.0
+
+      # Pythonの環境をセットアップ
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: '3.10'
+
+      # 必要なパッケージをインストール
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps
+          pip install pytest
+          pip install pytest-playwright
+
+      # テスト実行. テスト失敗時も継続
+      - name: PyTest
+        run: |
+          python -m pytest tests/test_practice3.py
+        continue-on-error: true
